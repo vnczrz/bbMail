@@ -1,0 +1,36 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>login</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <form (ngSubmit)="onSubmit()" [formGroup]="credentials">
+  <div class="input-group">
+    <ion-item>
+      <ion-input type="email" placeholder="Email" formControlName="email"></ion-input>
+    </ion-item>
+    <!-- EMAIL ERROR MESSAGES -->
+    <!-- <div *ngIf="credentials.email.touched && credentials.email.errors" class="errors">
+      <span *ngIf="credentials.email.errors?.required">Email is required</span>
+      <span *ngIf="credentials.email.errors?.email">Email is invalid</span>
+    </div> -->
+    <ion-item>
+      <ion-input type="password" placeholder="Password" formControlName="password"></ion-input>
+    </ion-item>
+    <!-- PW ERROR MESSAGES -->
+    <!-- <div *ngIf="credentials.password.touched && credentials.password.errors" class="errors">
+      <span *ngIf="credentials.password.errors?.required">Password is required</span>
+      <span *ngIf="credentials.password.errors?.minlength">Password needs to be 6 characters</span>
+    </div> -->
+  </div>
+
+  <ion-button type="submit" expand="block" [disabled]="!credentials.valid">
+    Log in</ion-button>
+  
+  <ion-button type="button" expand="block" color="light" fill="light" outline="true">
+    Not yet a Bird? Apply here!</ion-button>
+
+  </form>
+
+</ion-content>
