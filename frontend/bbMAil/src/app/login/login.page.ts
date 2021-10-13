@@ -1,7 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { Observable } from 'rxjs';
+import { AlertController } from '@ionic/angular';
 
-import { AuthenticationService } from '../authentication.service';
+
+import { AuthenticationService, AuthResponseData } from '../auth/authentication.service';
 
 @Component({
   selector: 'app-login',
@@ -11,8 +15,13 @@ import { AuthenticationService } from '../authentication.service';
 export class LoginPage implements OnInit {
   credentials: FormGroup;
 
+  isLoading = false;
+  error: string = null;
+
   constructor( 
     private auth : AuthenticationService,
+    private router : Router,
+    private alertController: AlertController
     ) { }
 
   ngOnInit() {
@@ -23,9 +32,45 @@ export class LoginPage implements OnInit {
     })
   }
 
+  showAlert() {
+
+    this.alertController.create({
+      header: 'Oops!',
+      message: this.error,
+      buttons: ['OK']
+    }).then(res => {
+
+      res.present();
+      this.credentials.reset();
+    });
+
+  }
+
   onSubmit() {
-    console.log(this.credentials.value)
-    this.auth.login(this.credentials.value)
+    console.log(this.credentials);
+    let authObsHandler: Observable<AuthResponseData>;
+
+    authObsHandler = this.auth.login(
+                        this.credentials.controls.email.value, 
+                        this.credentials.controls.password.value);
+
+    ///obs subscribe logic
+    authObsHandler.subscribe(
+      resData => {
+        console.log(resData);
+        this.isLoading = false;
+        //navigate to auth state homepage on success
+        this.router.navigate(['/tabs']);
+      },
+      ///we subscribed to errorMessage being emitted as an observable from the auth service
+      errorMessage => { 
+        console.log(errorMessage)
+        this.error = errorMessage
+        this.showAlert();
+        this.isLoading = false;
+      }
+  );       
+
   }
 
 }

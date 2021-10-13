@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
-import { AuthGuardService } from './auth-guard.service';
+import { AuthGuardService } from './auth/auth.guard';
 import { TabsPage } from './tabs/tabs.page';
 
 const routes: Routes = [
@@ -27,5 +27,3 @@ const routes: Routes = [
   exports: [RouterModule]
 })
 export class AppRoutingModule {}
-
-// loadChildren: () => import('./tabs/tabs.module').then(m => m.TabsPageModule)
