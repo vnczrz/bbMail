@@ -13,11 +13,12 @@ const routes: Routes = [
     loadChildren: () => import('./tabs/tabs.module').then( m => m.TabsPageModule),
     canActivate: [AuthGuardService],
   },
-    {
+  {
     path: '',
     redirectTo: '/login',
     pathMatch: 'full'
-  }
+  },
+
 
 ];
 @NgModule({

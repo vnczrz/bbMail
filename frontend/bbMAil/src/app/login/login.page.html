@@ -9,7 +9,7 @@
   
   
     <form (ngSubmit)="onSubmit()" [formGroup]="credentials">
-      <div class="input-group">
+      
         <ion-item>
           <ion-input type="email" placeholder="Email" formControlName="email"></ion-input>
           <!-- EMAIL ERROR MESSAGES -->
@@ -18,25 +18,50 @@
             <span *ngIf="credentials.controls.email.errors?.email">Email is invalid</span>
           </div>  
         </ion-item>
-
+        <hr>
         <ion-item>
-          <ion-input type="password" placeholder="Password" formControlName="password"></ion-input>
-        <!-- PW ERROR MESSAGES -->
-          <div *ngIf="credentials.controls.password.touched && credentials.controls.password.errors" class="errors">
+          <ion-input 
+          type="password" 
+          placeholder="Password" 
+          formControlName="password"></ion-input>
+          <div 
+          *ngIf="credentials.controls.password.touched && credentials.controls.password.errors" 
+          class="errors">
             <span *ngIf="credentials.controls.password.errors?.required">Password is required</span>
             <span *ngIf="credentials.controls.password.errors?.minlength">Password needs to be 6 characters</span>
           </div>  
         </ion-item>
+                <!-- PW ERROR MESSAGES -->
 
-      </div>
+        
+      <ion-item *ngIf="isRegisterMode">
+          <ion-input
+          type="password"  
+          placeholder="Confirm Password"
+          [formControlName]="confirmPassword"></ion-input>
+          <div 
+          *ngIf="credentials.controls.confirmPassword.touched" 
+          class="errors">
+            <span *ngIf="credentials.controls.confirmPassword.errors?.noMatch">Passwords must match!</span>
+          </div>
+      </ion-item>
+
+
+
+          
+
+
+
+
+      
+    </form>
     
       <ion-button type="submit" expand="block" [disabled]="!credentials.valid">
-        Log in</ion-button>
+        {{ isRegisterMode ? 'Sign Up!' : 'Login'}}</ion-button>
       
-      <ion-button type="button" expand="block" color="light" fill="light" outline="true">
-        Not yet a Bird? Apply here!</ion-button>
+      <ion-button type="button" expand="block" color="light" fill="light" outline="true" (click)="onRegisterMode()">
+        {{ isRegisterMode ?  "Oops! I'm already a member!"  : 'Not yet a member? Sign Up Here!' }} </ion-button>
     
-      </form>
 
 
 

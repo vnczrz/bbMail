@@ -23,10 +23,33 @@ export class AuthenticationService {
   
   //store user in behavior subject so can be casted to all interested components
   user = new BehaviorSubject<User>(null);
+
+  private tokenExpirationTimer: any;
   
   constructor(
     private router: Router,
     private http: HttpClient  ) { }
+
+  signUp(email: string, password: string) {
+    return this.http.post<AuthResponseData>(
+      'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyAOAl1DfW5noQdAG4Sqw36kOBnKRkpddL4',
+      {
+        email: email,
+        password: password,
+        returnSecureToken: true        
+      }
+    ).pipe(
+      catchError(this.handleError),
+      tap(resData => {
+        this.handleAuth(
+          resData.email,
+          resData.localId,
+          resData.idToken, 
+          +resData.expiresIn
+        )
+      })
+    )
+  }
 
   login(email: string, password: string) {
     ///return prepared obs... pass to interceptor then pass to handleAuth()
@@ -50,6 +73,61 @@ export class AuthenticationService {
         )
       })
     )
+  }
+
+  logout() {
+    console.log('logged out');
+    this.user.next(null);
+    this.router.navigate(['/auth']);
+
+    localStorage.removeItem('userData');
+
+    //clear timer when we logout
+    if(this.tokenExpirationTimer) {
+        clearTimeout(this.tokenExpirationTimer);
+    }
+
+    this.tokenExpirationTimer = null;
+
+}
+
+  autoLogin() {
+    const userData: {
+        email: string;
+        id: string;
+        _token: string;
+        _tokenExpirationDate: string;
+    } = JSON.parse(localStorage.getItem('userData'));
+
+    if (!userData) {
+        return;
+    }
+
+    //create loaded user
+    const loadedUser = new User(
+                        userData.email,
+                        userData.id,
+                        userData._token,
+                        new Date(userData._tokenExpirationDate)
+                    );
+
+    ///check for token & emit as current user
+    if(loadedUser.token) {
+        this.user.next(loadedUser);
+        //set session timeout
+        const expirationDuration = 
+            new Date(userData._tokenExpirationDate).getTime()
+            - new Date().getTime();
+        
+        this.autoLogout(expirationDuration);
+    }
+
+}
+
+  autoLogout(expirationDuration: number) {
+    this.tokenExpirationTimer = setTimeout(() => {
+        this.logout();
+    }, expirationDuration);
   }
 
   ///AuthHandler 
